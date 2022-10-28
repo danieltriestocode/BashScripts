@@ -4,21 +4,24 @@
 # Note: This will put the keys in default location
 # Pass in your email address for the arguement
 
+key_loc="$HOME/.ssh/id_ed25519"
+
 function _create_ssh-key()
 {
     local email=$1
 
-    # ssh-keygen -t ed25519 -C $email
-    # eval "$(ssh-agent -s)"
-    # ssh-add ~/.ssh/id_ed25519
-    # cat ~/.ssh/id_ed25519.pub
+    ssh-keygen -t ed25519 -C $email
+    eval "$(ssh-agent -s)"
+    ssh-add $key_loc
 
     isNotInstalled=$(dpkg-query -l xclip &> /dev/null | grep "no packages found" | wc -l)
-    
-    if [ $isNotInstalled ]; then
-        echo "xclip is not installed"
+
+    if [ $isNotInstalled == 1 ]; then
+        printf "Copy the contents below and add it to your Github account\n\n"
+        cat "$key_loc.pub"
     else
         echo "Copied contents of SSH public key to clipboard"
+        xclip -sel clipboard -i < "$key_loc.pub"
     fi
 }
 
