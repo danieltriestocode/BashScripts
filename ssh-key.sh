@@ -6,11 +6,19 @@
 
 key_loc="$HOME/.ssh/id_ed25519"
 
+function _set_git_userEmail()
+{
+    read -p "Enter global username for Git: " name
+
+    git config --global user.name "$name"
+    git config --global user.email "$email"
+}
+
 function _create_ssh-key()
 {
-    local email=$1
+    email=$1
 
-    ssh-keygen -t ed25519 -C $email
+    ssh-keygen -t ed25519 -C "$email"
     eval "$(ssh-agent -s)"
     ssh-add $key_loc
 
@@ -23,6 +31,11 @@ function _create_ssh-key()
         echo "Copied contents of SSH public key to clipboard"
         xclip -sel clipboard -i < "$key_loc.pub"
     fi
+
+
+    read -p "Would you like to configure global username and email address? (Y|y): " answer
+
+    if [ $answer == y ]; then _set_git_userEmail; fi
 }
 
 if [ -z $1 ]; then
